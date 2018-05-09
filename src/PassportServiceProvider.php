@@ -191,17 +191,24 @@ class PassportServiceProvider extends ServiceProvider
     /**
      * Make the authorization service instance.
      *
+     * NOTE: had to add the setEncryptionKey call here to get this to work properly
+     * @see https://github.com/laravel/passport/issues/437#issue-243595208
+     *
      * @return AuthorizationServer
      */
     public function makeAuthorizationServer()
     {
-        return new AuthorizationServer(
+        $server = new AuthorizationServer(
             $this->app->make(Bridge\ClientRepository::class),
             $this->app->make(Bridge\AccessTokenRepository::class),
             $this->app->make(Bridge\ScopeRepository::class),
             'file://'.Passport::keyPath('oauth-private.key'),
             'file://'.Passport::keyPath('oauth-public.key')
         );
+
+        $server->setEncryptionKey(env('APP_KEY'));
+
+        return $server;
     }
 
     /**
