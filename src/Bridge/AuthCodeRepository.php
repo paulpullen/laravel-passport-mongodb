@@ -5,6 +5,7 @@ namespace MoeenBasra\LaravelPassportMongoDB\Bridge;
 use Illuminate\Database\Connection;
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
+use MongoDB\BSON\UTCDateTime;
 
 class AuthCodeRepository implements AuthCodeRepositoryInterface
 {
@@ -47,7 +48,7 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
             'client_id' => $authCodeEntity->getClient()->getIdentifier(),
             'scopes' => $this->formatScopesForStorage($authCodeEntity->getScopes()),
             'revoked' => false,
-            'expires_at' => $authCodeEntity->getExpiryDateTime(),
+            'expires_at' => new UTCDateTime(($authCodeEntity->getExpiryDateTime())->getTimestamp() * 1000),
         ]);
     }
 

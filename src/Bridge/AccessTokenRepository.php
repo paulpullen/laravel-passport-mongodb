@@ -9,6 +9,7 @@ use MoeenBasra\LaravelPassportMongoDB\Events\AccessTokenCreated;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
+use MongoDB\BSON\UTCDateTime;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
@@ -59,9 +60,9 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
             'client_id' => $clientId = $accessTokenEntity->getClient()->getIdentifier(),
             'scopes' => $this->formatScopesForStorage($accessTokenEntity->getScopes()),
             'revoked' => false,
-            'created_at' => new DateTime,
-            'updated_at' => new DateTime,
-            'expires_at' => $accessTokenEntity->getExpiryDateTime(),
+            'created_at' => new UTCDateTime((new \DateTime())->getTimestamp() * 1000),
+            'updated_at' => new UTCDateTime((new \DateTime())->getTimestamp() * 1000),
+            'expires_at' => new UTCDateTime(($accessTokenEntity->getExpiryDateTime())->getTimestamp() * 1000),
         ]);
 
         $this->events->fire(new AccessTokenCreated($id, $userId, $clientId));
